@@ -1,0 +1,7 @@
+{
+  "name": "github-release",
+  "sdk": "go",
+  "dependencies": [
+    "github.com/aweris/daggerverse/gh@a77e1a3398109f46a6d7d01cee33e59dd653a774"
+  ]
+}
