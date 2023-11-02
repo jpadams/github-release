@@ -50,7 +50,7 @@ func (g *GithubRelease) Create(
 		assets_, isset := assets.Get()
 		if isset {
 			releaser = releaser.
-			WithMountedDirectory("/assets", assets).
+			WithMountedDirectory("/assets", assets_).
 			WithExec([]string{"release", "upload", tag, "/assets/*"})
 		}
 
