@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 )
 
 const (
@@ -23,11 +22,11 @@ func (g *GithubRelease) Create(
 		latest Optional[bool],
 		prerelease Optional[bool],
 	) (string, error) {
-		createCmd := []string{"release", "create", tag, "--title", fmt.Sprintf("'%s'", title)}
+		createCmd := []string{"release", "create", tag, "--title", title}
 
 		notes_, isset := notes.Get()
 		if isset {
-			createCmd = append(createCmd, fmt.Sprintf("'%s'", notes_))
+			createCmd = append(createCmd, notes_)
 		}
 
 		if draft.GetOr(false) {
@@ -60,11 +59,11 @@ func (g *GithubRelease) CreateWithAssets(
 		latest Optional[bool],
 		prerelease Optional[bool],
 	) (string, error) {
-		createCmd := []string{"release", "create", tag, "--title", fmt.Sprintf("'%s'", title)}
+		createCmd := []string{"release", "create", tag, "--title", title}
 
 		notes_, isset := notes.Get()
 		if isset {
-			createCmd = append(createCmd, fmt.Sprintf("'%s'", notes_))
+			createCmd = append(createCmd, notes_)
 		}
 
 		if draft.GetOr(false) {
