@@ -26,7 +26,7 @@ func (g *GithubRelease) Create(
 
 		notes_, isset := notes.Get()
 		if isset {
-			createCmd = append(createCmd, notes_)
+			createCmd = append(createCmd, "--notes", notes_)
 		}
 
 		if draft.GetOr(false) {
@@ -63,7 +63,7 @@ func (g *GithubRelease) CreateWithAssets(
 
 		notes_, isset := notes.Get()
 		if isset {
-			createCmd = append(createCmd, notes_)
+			createCmd = append(createCmd, "--notes", notes_)
 		}
 
 		if draft.GetOr(false) {
