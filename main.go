@@ -49,9 +49,17 @@ func (g *GithubRelease) Create(
 
 		assets_, isset := assets.Get()
 		if isset {
+			entries, err := assets_.Entries(ctx)
+			if err != nil {
+				return "", err
+			}
+
+			uploadCmd := append([]string{"release", "upload", tag}, entries...)
+
 			releaser = releaser.
 			WithMountedDirectory("/assets", assets_).
-			WithExec([]string{"release", "upload", tag, "/assets/*"})
+			WithWorkdir("/assets").
+			WithExec(uploadCmd)
 		}
 
 		return releaser.Stdout(ctx)
