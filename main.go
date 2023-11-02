@@ -17,6 +17,7 @@ func (g *GithubRelease) Create(
 		tag string,
 		title string,
 		token *Secret,
+		assets Optional[*Directory],
 		notes Optional[string],
 		draft Optional[bool],
 		latest Optional[bool],
@@ -40,50 +41,20 @@ func (g *GithubRelease) Create(
 		if prerelease.GetOr(false) {
 			createCmd = append(createCmd, "--prerelease")
 		}
-		return ghImage().
+
+		releaser := ghImage().
 		WithSecretVariable("GH_TOKEN", token).
 		WithEnvVariable("GH_REPO", repo).
-		WithExec(createCmd).
-		Stdout(ctx)
-}
+		WithExec(createCmd)
 
-func (g *GithubRelease) CreateWithAssets(
-		ctx context.Context,
-		repo string,
-		tag string,
-		title string,
-		token *Secret,
-		assets *Directory,
-		notes Optional[string],
-		draft Optional[bool],
-		latest Optional[bool],
-		prerelease Optional[bool],
-	) (string, error) {
-		createCmd := []string{"release", "create", tag, "--title", title}
-
-		notes_, isset := notes.Get()
+		assets_, isset := assets.Get()
 		if isset {
-			createCmd = append(createCmd, "--notes", notes_)
+			releaser = releaser.
+			WithMountedDirectory("/assets", assets).
+			WithExec([]string{"release", "upload", tag, "/assets/*"})
 		}
 
-		if draft.GetOr(false) {
-			createCmd = append(createCmd, "--draft")
-		}
-
-		if latest.GetOr(false) {
-			createCmd = append(createCmd, "--latest")
-		}
-
-		if prerelease.GetOr(false) {
-			createCmd = append(createCmd, "--prerelease")
-		}
-		return ghImage().
-		WithSecretVariable("GH_TOKEN", token).
-		WithEnvVariable("GH_REPO", repo).
-		WithMountedDirectory("/assets", assets).
-		WithExec(createCmd).
-		WithExec([]string{"release", "upload", tag, "/assets/"}).
-		Stdout(ctx)
+		return releaser.Stdout(ctx)
 }
 
 func ghImage() *Container {
