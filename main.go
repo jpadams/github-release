@@ -23,7 +23,7 @@ func (g *GithubRelease) Create(
 		latest Optional[bool],
 		prerelease Optional[bool],
 	) (string, error) {
-		createCmd := []string{"release", "create", tag}
+		createCmd := []string{"release", "create", tag, "--title", fmt.Sprintf("'%s'", title)}
 
 		notes_, isset := notes.Get()
 		if isset {
@@ -60,7 +60,7 @@ func (g *GithubRelease) CreateWithAssets(
 		latest Optional[bool],
 		prerelease Optional[bool],
 	) (string, error) {
-		createCmd := []string{"release", "create", tag}
+		createCmd := []string{"release", "create", tag, "--title", fmt.Sprintf("'%s'", title)}
 
 		notes_, isset := notes.Get()
 		if isset {
