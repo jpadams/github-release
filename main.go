@@ -17,28 +17,32 @@ func (g *GithubRelease) Create(
 		tag string,
 		title string,
 		token *Secret,
-		assets Optional[*Directory],
-		notes Optional[string],
-		draft Optional[bool],
-		latest Optional[bool],
-		prerelease Optional[bool],
+		// +optional
+		assets *Directory,
+		// +optional
+		notes string,
+		// +optional
+		draft bool,
+		// +optional
+		latest bool,
+		// +optional
+		prerelease bool,
 	) (string, error) {
 		createCmd := []string{"release", "create", tag, "--title", title}
 
-		notes_, isset := notes.Get()
-		if isset {
-			createCmd = append(createCmd, "--notes", notes_)
+		if notes != "" {
+			createCmd = append(createCmd, "--notes", notes)
 		}
 
-		if draft.GetOr(false) {
+		if draft {
 			createCmd = append(createCmd, "--draft")
 		}
 
-		if latest.GetOr(false) {
+		if latest {
 			createCmd = append(createCmd, "--latest")
 		}
 
-		if prerelease.GetOr(false) {
+		if prerelease {
 			createCmd = append(createCmd, "--prerelease")
 		}
 
@@ -47,9 +51,8 @@ func (g *GithubRelease) Create(
 		WithEnvVariable("GH_REPO", repo).
 		WithExec(createCmd)
 
-		assets_, isset := assets.Get()
-		if isset {
-			entries, err := assets_.Entries(ctx)
+		if assets != nil {
+			entries, err := assets.Entries(ctx)
 			if err != nil {
 				return "", err
 			}
@@ -57,7 +60,7 @@ func (g *GithubRelease) Create(
 			uploadCmd := append([]string{"release", "upload", tag}, entries...)
 
 			releaser = releaser.
-			WithMountedDirectory("/assets", assets_).
+			WithMountedDirectory("/assets", assets).
 			WithWorkdir("/assets").
 			WithExec(uploadCmd)
 		}
